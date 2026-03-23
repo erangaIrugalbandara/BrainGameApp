@@ -31,7 +31,7 @@ export default function App() {
   return (
     <SafeAreaProvider>
       <NavigationContainer>
-        <Stack.Navigator initialRouteName={initialRoute} screenOptions={{ headerShown: false }}>
+        <Stack.Navigator id={undefined} initialRouteName={initialRoute} screenOptions={{ headerShown: false }}>
           <Stack.Screen name="Welcome" component={WelcomeScreen} />
           <Stack.Screen name="MainMenu" component={MainMenuScreen} />
           <Stack.Screen name="Game1Menu" component={Game1MenuScreen} />
