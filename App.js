@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -11,27 +11,13 @@ import Game2MenuScreen from './src/screens/Game2MenuScreen';
 import Game2Screen from './src/screens/Game2Screen';
 import RecordsScreen from './src/screens/RecordsScreen';
 
-import { getUserName } from './src/utils/storage';
-
 const Stack = createNativeStackNavigator();
 
 export default function App() {
-  const [initialRoute, setInitialRoute] = useState(null);
-
-  useEffect(() => {
-    const checkUser = async () => {
-      const name = await getUserName();
-      setInitialRoute(name ? 'MainMenu' : 'Welcome');
-    };
-    checkUser();
-  }, []);
-
-  if (!initialRoute) return null;
-
   return (
     <SafeAreaProvider>
       <NavigationContainer>
-        <Stack.Navigator initialRouteName={initialRoute} screenOptions={{ headerShown: false }}>
+        <Stack.Navigator initialRouteName="MainMenu" screenOptions={{ headerShown: false }}>
           <Stack.Screen name="Welcome" component={WelcomeScreen} />
           <Stack.Screen name="MainMenu" component={MainMenuScreen} />
           <Stack.Screen name="Game1Menu" component={Game1MenuScreen} />

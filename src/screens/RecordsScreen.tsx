@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
+import PlayfulBackground from '../components/PlayfulBackground';
 import { retrieveGameRecords } from '../utils/storage';
+import { THEME } from '../utils/theme';
 
 interface GameRecord {
   date: string;
@@ -15,7 +17,6 @@ export default function RecordsScreen({ route, navigation }: any) {
   useEffect(() => {
     const fetchRecords = async () => {
       const data = await retrieveGameRecords(gameId);
-      // Sort by date descending (newest first)
       data.sort((a: GameRecord, b: GameRecord) => new Date(b.date).getTime() - new Date(a.date).getTime());
       setRecords(data);
     };
@@ -25,51 +26,144 @@ export default function RecordsScreen({ route, navigation }: any) {
   const renderItem = ({ item }: { item: GameRecord }) => (
     <View style={styles.recordItem}>
       <View>
-        <Text style={styles.dateText}>{new Date(item.date).toLocaleDateString()} {new Date(item.date).toLocaleTimeString()}</Text>
+        <Text style={styles.dateText}>
+          {new Date(item.date).toLocaleDateString()} {new Date(item.date).toLocaleTimeString()}
+        </Text>
         <Text style={styles.levelText}>Level: {item.level}</Text>
       </View>
-      <View>
-        <Text style={styles.scoreText}>
-          {gameId === 1 ? `${item.score}s` : `${item.score} pts`}
-        </Text>
+      <View style={styles.scorePill}>
+        <Text style={styles.scoreText}>{gameId === 1 ? `${item.score}s` : `${item.score} pts`}</Text>
       </View>
     </View>
   );
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>History & Records</Text>
-      <Text style={styles.subtitle}>{gameId === 1 ? 'Number Search' : 'Stroop Test'}</Text>
-      
-      {records.length === 0 ? (
-        <Text style={styles.noRecords}>No games played yet. Go play some!</Text>
-      ) : (
-        <FlatList
-          data={records}
-          keyExtractor={(_, index) => index.toString()}
-          renderItem={renderItem}
-          style={styles.list}
-          contentContainerStyle={{ paddingBottom: 20 }}
-        />
-      )}
+    <PlayfulBackground variant="mint" contentStyle={styles.safe}>
+      <View style={styles.container}>
+        <View style={styles.header}>
+          <Text style={styles.eyebrow}>History</Text>
+          <Text style={styles.title}>Records</Text>
+          <Text style={styles.subtitle}>{gameId === 1 ? 'Number Search' : 'Stroop Test'}</Text>
+        </View>
 
-      <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-        <Text style={styles.backText}>Go Back</Text>
-      </TouchableOpacity>
-    </View>
+        {records.length === 0 ? (
+          <View style={styles.emptyCard}>
+            <Text style={styles.emptyTitle}>No games yet</Text>
+            <Text style={styles.emptyText}>Play a round to start your record board.</Text>
+          </View>
+        ) : (
+          <FlatList
+            data={records}
+            keyExtractor={(_, index) => index.toString()}
+            renderItem={renderItem}
+            style={styles.list}
+            contentContainerStyle={{ paddingBottom: 20 }}
+            showsVerticalScrollIndicator={false}
+          />
+        )}
+
+        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+          <Text style={styles.backText}>Go Back</Text>
+        </TouchableOpacity>
+      </View>
+    </PlayfulBackground>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, paddingTop: 50, paddingHorizontal: 20, backgroundColor: '#f9f9f9' },
-  title: { fontSize: 28, fontWeight: 'bold', textAlign: 'center', color: '#333' },
-  subtitle: { fontSize: 18, textAlign: 'center', marginBottom: 20, color: '#666' },
-  noRecords: { textAlign: 'center', fontSize: 16, marginTop: 50, color: '#999' },
-  list: { flex: 1 },
-  recordItem: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#fff', padding: 15, borderRadius: 10, marginBottom: 10, shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 4, elevation: 2 },
-  dateText: { fontSize: 14, color: '#555', marginBottom: 4 },
-  levelText: { fontSize: 16, fontWeight: 'bold', color: '#007BFF' },
-  scoreText: { fontSize: 22, fontWeight: 'bold', color: '#333' },
-  backButton: { backgroundColor: '#6c757d', padding: 15, borderRadius: 10, alignItems: 'center', marginTop: 10, marginBottom: 30 },
-  backText: { color: 'white', fontSize: 18, fontWeight: 'bold' }
+  safe: {
+    paddingHorizontal: 20
+  },
+  container: {
+    flex: 1
+  },
+  header: {
+    marginBottom: 18
+  },
+  eyebrow: {
+    fontFamily: THEME.fonts.mono,
+    fontSize: 12,
+    letterSpacing: 2,
+    textTransform: 'uppercase',
+    color: THEME.colors.muted,
+    marginBottom: 6
+  },
+  title: {
+    fontFamily: THEME.fonts.display,
+    fontSize: 30,
+    color: THEME.colors.ink
+  },
+  subtitle: {
+    fontFamily: THEME.fonts.body,
+    fontSize: 15,
+    color: THEME.colors.muted,
+    marginTop: 6
+  },
+  emptyCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: THEME.radius.lg,
+    padding: 20,
+    ...THEME.shadow
+  },
+  emptyTitle: {
+    fontFamily: THEME.fonts.display,
+    fontSize: 18,
+    color: THEME.colors.ink,
+    marginBottom: 6
+  },
+  emptyText: {
+    fontFamily: THEME.fonts.body,
+    fontSize: 14,
+    color: THEME.colors.muted,
+    lineHeight: 20
+  },
+  list: {
+    flex: 1
+  },
+  recordItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+    padding: 16,
+    borderRadius: THEME.radius.lg,
+    marginBottom: 12,
+    ...THEME.shadow
+  },
+  dateText: {
+    fontFamily: THEME.fonts.body,
+    fontSize: 12,
+    color: THEME.colors.muted,
+    marginBottom: 4
+  },
+  levelText: {
+    fontFamily: THEME.fonts.display,
+    fontSize: 16,
+    color: THEME.colors.primaryDark
+  },
+  scorePill: {
+    backgroundColor: '#F1F5FF',
+    borderRadius: 999,
+    paddingHorizontal: 12,
+    paddingVertical: 6
+  },
+  scoreText: {
+    fontFamily: THEME.fonts.display,
+    fontSize: 16,
+    color: THEME.colors.ink
+  },
+  backButton: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: THEME.radius.md,
+    paddingVertical: 12,
+    alignItems: 'center',
+    marginTop: 10,
+    borderWidth: 1,
+    borderColor: THEME.colors.outline
+  },
+  backText: {
+    fontFamily: THEME.fonts.display,
+    fontSize: 14,
+    color: THEME.colors.ink
+  }
 });
